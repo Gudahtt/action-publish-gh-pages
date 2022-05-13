@@ -4,14 +4,20 @@ set -x
 set -e
 set -o pipefail
 
-SOURCE_DIRECTORY="${1}"
-PACKAGE_BUILD_COMMAND="${2}"
-DESTINATION_DIRECTORY="${3}"
-COMMIT_MESSAGE="${4}"
+DEPLOY_SCRIPT_PATH="${1}"
+SOURCE_DIRECTORY="${2}"
+PACKAGE_BUILD_COMMAND="${3}"
+DESTINATION_DIRECTORY="${4}"
+COMMIT_MESSAGE="${5}"
 CURRENT_BRANCH=$(git branch --show-current)
 
 if [[ -z $SOURCE_DIRECTORY ]]; then
   echo "Error: No source directory specified."
+  exit 1
+fi
+
+if [[ -z $DEPLOY_SCRIPT_PATH ]]; then
+  echo "Error: No deploy script specified."
   exit 1
 fi
 
@@ -69,7 +75,7 @@ fi
 
 yarn "${PACKAGE_BUILD_COMMAND}"
 
-npx gh-pages@3.2.3 \
+node "${DEPLOY_SCRIPT_PATH}" \
   "$ADD" \
   --dist "${SOURCE_DIRECTORY}" \
   --dest "${DESTINATION_DIRECTORY}" \
